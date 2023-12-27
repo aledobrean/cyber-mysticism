@@ -13,7 +13,7 @@ class ThreeCardsDivinationServiceTest {
     private ThreeCardsDivinationService service;
 
     @Test
-    void getReading() {
+    void getReading() throws Exception {
         assertEquals(3, service.getReading().size());
     }
 

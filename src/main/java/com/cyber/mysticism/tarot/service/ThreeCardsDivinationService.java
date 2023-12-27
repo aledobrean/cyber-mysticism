@@ -2,6 +2,7 @@ package com.cyber.mysticism.tarot.service;
 
 import com.cyber.mysticism.tarot.json.Card;
 import com.cyber.mysticism.tarot.repository.TarotDeckRepository;
+import com.cyber.mysticism.tarot.service.exceptions.DivinationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,8 +22,8 @@ public class ThreeCardsDivinationService {
     private final TarotDeckRepository tarotDeckRepository;
 
     @Autowired
-    public ThreeCardsDivinationService() throws DivinationException {
-        this.tarotDeckRepository = TarotDeckRepository.getInstance();
+    public ThreeCardsDivinationService(TarotDeckRepository tarotDeckRepository) {
+        this.tarotDeckRepository = tarotDeckRepository;
     }
 
     private static Collector<Card, Object, Stream<Card>> toShuffledStream() {
@@ -35,18 +36,23 @@ public class ThreeCardsDivinationService {
     /**
      * @return a map that contains the reading in the form past, present and future
      */
-    public Map<String, Card> getReading() {
+    public Map<String, Card> getReading() throws DivinationException {
         List<Card> extractedCards = new ArrayList<>();
         Map<String, Card> reading = new HashMap<>();
-        Card majorArcanaCard = extractMajorArcana();
+        Optional<Card> majorArcana = extractMajorArcana();
+        Card majorArcanaCard = majorArcana.orElseThrow(() -> new DivinationException("No Major Arcana cards was returned."));
 
         extractedCards.add(majorArcanaCard);
         extractedCards.addAll(extractCardsWithFilter(majorArcanaCard.number()));
-        extractedCards = shuffleCards(extractedCards);
+        extractedCards = extractedCards.stream().collect(toShuffledStream()).toList();
 
-        reading.put("past", extractedCards.get(0));
-        reading.put("present", extractedCards.get(1));
-        reading.put("future", extractedCards.get(2));
+        if (extractedCards.size() == 3) {
+            reading.put("past", extractedCards.get(0));
+            reading.put("present", extractedCards.get(1));
+            reading.put("future", extractedCards.get(2));
+        } else {
+            throw new DivinationException("Three Cards Tarot reading failed.");
+        }
 
         return reading;
     }
@@ -62,26 +68,20 @@ public class ThreeCardsDivinationService {
     }
 
     /**
-     * @return one major arcana card from the deck.
+     * @return one major arcana card from the deck of cards.
      */
-    private Card extractMajorArcana() {
+    private Optional<Card> extractMajorArcana() {
         Stream<Card> majorArcanaDeck = getMajorArcanaCards().stream();
-
-        return majorArcanaDeck.collect(toShuffledStream()).findFirst().orElse(tarotDeckRepository.getCardByNumber(0));
+        return majorArcanaDeck.collect(toShuffledStream()).findFirst();
     }
 
     /**
-     * Extract two random cards from the deck.
+     * Extract two random cards from the deck of cards.
      *
      * @param duplicatedCardNumber represents a card that was already extracted, avoiding duplicates
      */
     private List<Card> extractCardsWithFilter(Integer duplicatedCardNumber) {
-        Stream<Card> deck = getCards().stream();
-
-        return deck.filter(card -> !duplicatedCardNumber.equals(card.number())).collect(toShuffledStream()).limit(2).toList();
-    }
-
-    private List<Card> shuffleCards(List<Card> cards) {
-        return cards.stream().collect(toShuffledStream()).toList();
+        Stream<Card> cards = getCards().stream();
+        return cards.filter(card -> !duplicatedCardNumber.equals(card.number())).collect(toShuffledStream()).limit(2).toList();
     }
 }

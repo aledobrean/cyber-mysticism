@@ -16,7 +16,7 @@ class ThreeCardsDivinationControllerTest {
     ThreeCardsDivinationController threeCardsDivinationController;
 
     @Test
-    void performReading() {
+    void performReading() throws Exception {
         Map<String, Card> reading = threeCardsDivinationController.performReading();
         assertEquals(3, reading.size());
     }
