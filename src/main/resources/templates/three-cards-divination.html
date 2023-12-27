@@ -1,0 +1,18 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <title>Three Cards Divination</title>
+    <script th:inline="javascript">
+        /* Fetching data from the REST endpoint */
+        function fetchData() {
+            fetch('/three-cards-divination')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('output').innerText = JSON.stringify(data);
+                });
+        }
+    </script>
+</head>
+<body onload="fetchData()">
+</body>
+</html>
