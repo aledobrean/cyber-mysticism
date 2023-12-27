@@ -28,7 +28,7 @@ public class ThreeCardsDivinationService {
 
     private static Collector<Card, Object, Stream<Card>> toShuffledStream() {
         return Collectors.collectingAndThen(Collectors.toList(), collected -> {
-            Collections.shuffle(collected);
+            Collections.shuffle(collected, ThreadLocalRandom.current());
             return collected.stream();
         });
     }
@@ -41,8 +41,10 @@ public class ThreeCardsDivinationService {
         Map<String, Card> reading = new HashMap<>();
         Optional<Card> majorArcana = extractMajorArcana();
         Card majorArcanaCard = majorArcana.orElseThrow(() -> new DivinationException("No Major Arcana cards was returned."));
-
-        extractedCards.add(majorArcanaCard);
+        if (majorArcanaCard != null) {
+            extractedCards.add(majorArcanaCard);
+            extractedCards.addAll(extractCardsWithFilter(majorArcanaCard.number()));
+        }
         extractedCards.addAll(extractCardsWithFilter(majorArcanaCard.number()));
         extractedCards = extractedCards.stream().collect(toShuffledStream()).toList();
 
@@ -57,12 +59,12 @@ public class ThreeCardsDivinationService {
         return reading;
     }
 
-    public List<Card> getCards() {
+    private List<Card> getCards() {
         logger.info("event=retrieve_cards, type={}", THREE_CARDS_DIVINATION);
         return tarotDeckRepository.getCards();
     }
 
-    public List<Card> getMajorArcanaCards() {
+    private List<Card> getMajorArcanaCards() {
         logger.info("event=retrieve_major_arcana_cards, type={}", THREE_CARDS_DIVINATION);
         return getCards().stream().filter(card -> MAJOR_ARCANA.equals(card.arcana())).toList();
     }
