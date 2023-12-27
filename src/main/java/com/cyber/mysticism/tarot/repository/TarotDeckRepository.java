@@ -41,10 +41,11 @@ public class TarotDeckRepository {
 
     private Deck parseDeck() throws TarotDeckAccessException {
         try {
-            return objectMapper.readValue(new BufferedReader(Files.newBufferedReader(Path.of(resourceFile.getURI()))), Deck.class);
-        } catch (IOException e) {
-            throw new TarotDeckAccessException("An error occurred while accessing data", e);
-        }
+            try (BufferedReader reader = Files.newBufferedReader(Path.of(resourceFile.getURI()))) {
+                return objectMapper.readValue(reader, Deck.class);
+            } catch (IOException e) {
+                throw new TarotDeckAccessException("An error occurred while accessing data", e);
+            }
     }
     }
 }
