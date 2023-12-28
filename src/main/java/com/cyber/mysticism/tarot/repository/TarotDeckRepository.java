@@ -10,6 +10,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Repository;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -23,7 +24,7 @@ public class TarotDeckRepository {
     private final Resource resourceFile;
 
     @Autowired
-    private TarotDeckRepository() throws TarotDeckAccessException {
+    public TarotDeckRepository() throws TarotDeckAccessException {
         ResourceLoader resourceLoader = new DefaultResourceLoader();
         this.resourceFile = resourceLoader.getResource("classpath:static/tarot-deck/tarot-cards.json");
         this.objectMapper = new ObjectMapper();
@@ -40,12 +41,10 @@ public class TarotDeckRepository {
     }
 
     private Deck parseDeck() throws TarotDeckAccessException {
-        try {
-            try (BufferedReader reader = Files.newBufferedReader(Path.of(resourceFile.getURI()))) {
-                return objectMapper.readValue(reader, Deck.class);
-            } catch (IOException e) {
-                throw new TarotDeckAccessException("An error occurred while accessing data", e);
-            }
-    }
+        try (BufferedReader reader = Files.newBufferedReader(Path.of(resourceFile.getURI()))) {
+            return objectMapper.readValue(reader, Deck.class);
+        } catch (IOException e) {
+            throw new TarotDeckAccessException("An error occurred while accessing data", e);
+        }
     }
 }

@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -43,17 +44,17 @@ public class ThreeCardsDivinationService {
         Card majorArcanaCard = majorArcana.orElseThrow(() -> new DivinationException("No Major Arcana cards was returned."));
         if (majorArcanaCard != null) {
             extractedCards.add(majorArcanaCard);
-            extractedCards.addAll(extractCardsWithFilter(majorArcanaCard.number()));
-        }
-        extractedCards.addAll(extractCardsWithFilter(majorArcanaCard.number()));
-        extractedCards = extractedCards.stream().collect(toShuffledStream()).toList();
+            extractedCards.addAll(extractCardsWithFilter(majorArcanaCard.name()));
+            extractedCards = extractedCards.stream().collect(toShuffledStream()).toList();
 
-        if (extractedCards.size() == 3) {
-            reading.put("past", extractedCards.get(0));
-            reading.put("present", extractedCards.get(1));
-            reading.put("future", extractedCards.get(2));
-        } else {
-            throw new DivinationException("Three Cards Tarot reading failed.");
+            if (extractedCards.size() == 3) {
+                reading.put("past", extractedCards.get(0));
+                reading.put("present", extractedCards.get(1));
+                reading.put("future", extractedCards.get(2));
+            } else {
+                logger.info("event=reading_failure, type=three_cards_divination");
+                throw new DivinationException("Three Cards Tarot reading failed.");
+            }
         }
 
         return reading;
@@ -64,11 +65,6 @@ public class ThreeCardsDivinationService {
         return tarotDeckRepository.getCards();
     }
 
-    private List<Card> getMajorArcanaCards() {
-        logger.info("event=retrieve_major_arcana_cards, type={}", THREE_CARDS_DIVINATION);
-        return getCards().stream().filter(card -> MAJOR_ARCANA.equals(card.arcana())).toList();
-    }
-
     /**
      * @return one major arcana card from the deck of cards.
      */
@@ -77,13 +73,18 @@ public class ThreeCardsDivinationService {
         return majorArcanaDeck.collect(toShuffledStream()).findFirst();
     }
 
+    private List<Card> getMajorArcanaCards() {
+        logger.info("event=retrieve_major_arcana_cards, type={}", THREE_CARDS_DIVINATION);
+        return getCards().stream().filter(card -> MAJOR_ARCANA.equals(card.arcana())).toList();
+    }
+
     /**
      * Extract two random cards from the deck of cards.
      *
-     * @param duplicatedCardNumber represents a card that was already extracted, avoiding duplicates
+     * @param duplicatedCardName represents a card that was already extracted, avoiding duplicates
      */
-    private List<Card> extractCardsWithFilter(Integer duplicatedCardNumber) {
+    private List<Card> extractCardsWithFilter(String duplicatedCardName) {
         Stream<Card> cards = getCards().stream();
-        return cards.filter(card -> !duplicatedCardNumber.equals(card.number())).collect(toShuffledStream()).limit(2).toList();
+        return cards.filter(card -> !duplicatedCardName.equals(card.name())).collect(toShuffledStream()).limit(2).toList();
     }
 }
