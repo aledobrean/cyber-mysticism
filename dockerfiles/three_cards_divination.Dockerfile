@@ -14,7 +14,7 @@ RUN ./mvnw package
 COPY ../three-cards-divination/target ./three-cards-divination/target
 
 # Application stage
-FROM eclipse-temurin:21-jdk-alpine
+FROM eclipse-temurin:21-jre-alpine
 RUN addgroup -S spring && adduser -S spring -G spring
 USER spring:spring
 
