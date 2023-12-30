@@ -11,8 +11,18 @@
     <groupId>com.cyber</groupId>
     <artifactId>mysticism</artifactId>
     <version>0.0.1-SNAPSHOT</version>
+    <packaging>pom</packaging>
     <name>mysticism</name>
     <description>Cyber Mysticism Platform</description>
+
+    <profiles>
+        <profile>
+            <id>three-cards-divination</id>
+            <modules>
+                <module>three-cards-divination</module>
+            </modules>
+        </profile>
+    </profiles>
     <properties>
         <java.version>21</java.version>
     </properties>
