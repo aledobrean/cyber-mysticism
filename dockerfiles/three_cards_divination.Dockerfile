@@ -5,13 +5,13 @@ USER spring:spring
 
 WORKDIR /app
 
-COPY ../.mvn .mvn
-COPY ../mvnw pom.xml ./
-COPY ../three-cards-divination/pom.xml ./three-cards-divination/
+COPY --chown=spring:spring .mvn .mvn
+COPY --chown=spring:spring mvnw pom.xml ./
+COPY --chown=spring:spring three-cards-divination/pom.xml ./three-cards-divination/
 RUN ./mvnw dependency:resolve
-COPY ../three-cards-divination/src ./three-cards-divination/src
-RUN ./mvnw package
-COPY ../three-cards-divination/target ./three-cards-divination/target
+COPY --chown=spring:spring three-cards-divination/src ./three-cards-divination/src
+RUN ./mvnw package -DskipTests
+COPY --chown=spring:spring three-cards-divination/target ./three-cards-divination/target
 
 # Application stage
 FROM eclipse-temurin:21-jre-alpine

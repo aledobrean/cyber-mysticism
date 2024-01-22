@@ -1,0 +1,46 @@
+services:
+  db:
+    container_name: postgres_container
+    image: postgres
+    restart: always
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: app_user
+      POSTGRES_PASSWORD: app_password
+      POSTGRES_DB: cyber_mysticism
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U app_user -d cyber_mysticism" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  three-cards-divination:
+    container_name: three_cards_divination_container
+    image: aledobrean/three_cards_divination
+    ports:
+      - "5050:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/cyber_mysticism
+      SPRING_DATASOURCE_USERNAME: app_user
+      SPRING_DATASOURCE_PASSWORD: app_password
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+    depends_on:
+      db:
+        condition: service_healthy
+
+# used for development
+#  pg-admin:
+#    container_name: pgadmin4_container
+#    image: dpage/pgadmin4
+#    restart: always
+#    environment:
+#      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+#      PGADMIN_DEFAULT_PASSWORD: root
+#    ports:
+#      - "5080:80"
+
+volumes:
+  pgdata:
