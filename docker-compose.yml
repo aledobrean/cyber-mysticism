@@ -19,7 +19,7 @@ services:
 
   three-cards-divination:
     container_name: three_cards_divination_container
-    image: aledobrean/three-cards-divination
+    image: ${SERVICE_IMAGE:-aledobrean/three-cards-divination:latest}
     ports:
       - "5050:8080"
     environment:
