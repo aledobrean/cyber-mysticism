@@ -45,17 +45,23 @@ public class ThreeCardsDivinationService {
      * for a specific user, returning only non-duplicate readings
      */
     public Map<String, Card> getReadingForUser(String username, String email) throws DivinationException, UserNotFoundException {
+        TarotUser retrievedUser = getTarotUser(username, email);
+
+        Map<String, Card> threeCardsDivinationReading = getReading();
+
+        return getUniqueReadingBasedOnHashCode(retrievedUser, threeCardsDivinationReading);
+    }
+
+    private TarotUser getTarotUser(String username, String email) throws UserNotFoundException {
         Optional<TarotUser> retrievedUser = userRepository.findById(username);
         Optional<TarotUser> retrievedUserByEmail = userRepository.findByEmail(email);
-        if (retrievedUser.isEmpty() || retrievedUserByEmail.isEmpty() || retrievedUser.get() != retrievedUserByEmail.get()) {
+        if (retrievedUser.isEmpty() || retrievedUserByEmail.isEmpty() ||
+                !retrievedUser.get().equals(retrievedUserByEmail.get())) {
             logger.info("event=reading_for_user_failed, status=error, reason=invalid_user, type={}, user={}",
                     THREE_CARDS_DIVINATION, username);
             throw new UserNotFoundException("Cannot perform reading, user not found");
         }
-
-        Map<String, Card> threeCardsDivinationReading = getReading();
-
-        return getUniqueReadingBasedOnHashCode(retrievedUser.get(), threeCardsDivinationReading);
+        return retrievedUser.get();
     }
 
     /**

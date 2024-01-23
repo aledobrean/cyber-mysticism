@@ -28,18 +28,22 @@ public class ThreeCardsDivinationController {
     @GetMapping("/three-cards-divination")
     public Map<String, Card> performReadingForUser(@RequestHeader(value = "Authorization", required = false) String authHeader)
             throws DivinationException, ForbiddenAccessException, UnauthorisedAccessException {
+        String[] credentials = authenticateAndParseHeader(authHeader);
+        String username = credentials[0];
+        String email = credentials[1];
+        try {
+            return threeCardsDivinationService.getReadingForUser(username, email);
+        } catch (UserNotFoundException e) {
+            throw new UnauthorisedAccessException("Unauthorized!");
+        }
+    }
+
+    private String[] authenticateAndParseHeader(String authHeader) throws UnauthorisedAccessException, ForbiddenAccessException {
         if (authHeader == null) {
             throw new ForbiddenAccessException("Access forbidden!");
         } else if (!authHeader.isEmpty() && authHeader.toLowerCase().startsWith("basic")) {
             String base64Credentials = authHeader.substring("Basic".length()).trim();
-            String[] credentials = getCredentialsFromHeaders(base64Credentials);
-            String username = credentials[0];
-            String email = credentials[1];
-            try {
-                return threeCardsDivinationService.getReadingForUser(username, email);
-            } catch (UserNotFoundException e) {
-                throw new UnauthorisedAccessException("Unauthorized!");
-            }
+            return getCredentialsFromHeaders(base64Credentials);
         } else {
             throw new UnauthorisedAccessException("Unauthorized!");
         }

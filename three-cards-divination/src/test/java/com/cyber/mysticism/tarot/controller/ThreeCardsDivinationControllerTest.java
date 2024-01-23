@@ -19,6 +19,7 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class ThreeCardsDivinationControllerTest {
 
+    public static final String AUTH_HEADER = "Basic dXNlcjplbWFpbA==";
     @Mock
     private ThreeCardsDivinationService threeCardsDivinationService;
     @InjectMocks
@@ -30,7 +31,7 @@ class ThreeCardsDivinationControllerTest {
         Map<String, Card> extracted = Map.of("past", card);
         when(threeCardsDivinationService.getReadingForUser("user", "email")).thenReturn(extracted);
 
-        assertEquals(extracted, threeCardsDivinationController.performReadingForUser("Basic dXNlcjplbWFpbA=="));
+        assertEquals(extracted, threeCardsDivinationController.performReadingForUser(AUTH_HEADER));
     }
 
     @Test
@@ -38,7 +39,7 @@ class ThreeCardsDivinationControllerTest {
         Map<String, Card> extracted = Map.of();
         when(threeCardsDivinationService.getReadingForUser("user", "email")).thenReturn(extracted);
 
-        assertEquals(extracted, threeCardsDivinationController.performReadingForUser("Basic dXNlcjplbWFpbA=="));
+        assertEquals(extracted, threeCardsDivinationController.performReadingForUser(AUTH_HEADER));
     }
 
     @Test

@@ -22,6 +22,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 class ThreeCardsDivinationControllerFunctionalTest {
 
+    public static final String AUTH_HEADER = "Basic dXNlcjplbWFpbA==";
     @Autowired
     private MockMvc mockMvc;
     @MockBean
@@ -34,7 +35,7 @@ class ThreeCardsDivinationControllerFunctionalTest {
         when(threeCardsDivinationService.getReadingForUser("user", "email")).thenReturn(extracted);
 
         mockMvc.perform(get("/three-cards-divination")
-                        .header("Authorization", "Basic dXNlcjplbWFpbA=="))
+                        .header("Authorization", AUTH_HEADER))
                 .andExpectAll(
                         status().isOk(),
                         content().contentType(MediaType.APPLICATION_JSON),
@@ -46,7 +47,7 @@ class ThreeCardsDivinationControllerFunctionalTest {
         when(threeCardsDivinationService.getReadingForUser("user", "email")).thenReturn(Map.of());
 
         mockMvc.perform(get("/three-cards-divination")
-                        .header("Authorization", "Basic dXNlcjplbWFpbA=="))
+                        .header("Authorization", AUTH_HEADER))
                 .andExpectAll(
                         status().isOk(),
                         content().contentType(MediaType.APPLICATION_JSON),
@@ -65,7 +66,7 @@ class ThreeCardsDivinationControllerFunctionalTest {
         when(threeCardsDivinationService.getReadingForUser("user", "email")).thenThrow(UserNotFoundException.class);
 
         mockMvc.perform(get("/three-cards-divination")
-                        .header("Authorization", "Basic dXNlcjplbWFpbA=="))
+                        .header("Authorization", AUTH_HEADER))
                 .andExpect(status().isUnauthorized());
     }
 
