@@ -1,5 +1,5 @@
 .git
-.gitignore
+../.gitignore
 *Dockerfile
 README.md
 target/

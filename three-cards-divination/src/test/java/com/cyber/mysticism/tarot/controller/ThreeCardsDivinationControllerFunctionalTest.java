@@ -2,7 +2,7 @@ package com.cyber.mysticism.tarot.controller;
 
 import com.cyber.mysticism.tarot.json.Card;
 import com.cyber.mysticism.tarot.service.ThreeCardsDivinationService;
-import com.cyber.mysticism.tarot.service.exceptions.DivinationException;
+import com.cyber.mysticism.tarot.service.exceptions.UserNotFoundException;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -22,6 +22,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 class ThreeCardsDivinationControllerFunctionalTest {
 
+    public static final String AUTH_HEADER = "Basic dXNlcjplbWFpbA==";
     @Autowired
     private MockMvc mockMvc;
     @MockBean
@@ -31,9 +32,10 @@ class ThreeCardsDivinationControllerFunctionalTest {
     void performReading_oneCard() throws Exception {
         Card card = new Card("The Fool", 0, "Major Arcana", "m00.jpg", List.of("Watch for new projects and new beginnings"));
         Map<String, Card> extracted = Map.of("past", card);
-        when(threeCardsDivinationService.getReading()).thenReturn(extracted);
+        when(threeCardsDivinationService.getReadingForUser("user", "email")).thenReturn(extracted);
 
-        mockMvc.perform(get("/three-cards-divination"))
+        mockMvc.perform(get("/three-cards-divination")
+                        .header("Authorization", AUTH_HEADER))
                 .andExpectAll(
                         status().isOk(),
                         content().contentType(MediaType.APPLICATION_JSON),
@@ -42,9 +44,10 @@ class ThreeCardsDivinationControllerFunctionalTest {
 
     @Test
     void performReading_zeroCards() throws Exception {
-        when(threeCardsDivinationService.getReading()).thenReturn(Map.of());
+        when(threeCardsDivinationService.getReadingForUser("user", "email")).thenReturn(Map.of());
 
-        mockMvc.perform(get("/three-cards-divination"))
+        mockMvc.perform(get("/three-cards-divination")
+                        .header("Authorization", AUTH_HEADER))
                 .andExpectAll(
                         status().isOk(),
                         content().contentType(MediaType.APPLICATION_JSON),
@@ -52,10 +55,24 @@ class ThreeCardsDivinationControllerFunctionalTest {
     }
 
     @Test
-    void performReading_throwsException() throws Exception {
-        when(threeCardsDivinationService.getReading()).thenThrow(DivinationException.class);
+    void performReading_emptyAuthHeader() throws Exception {
+        mockMvc.perform(get("/three-cards-divination")
+                        .header("Authorization", " "))
+                .andExpect(status().isUnauthorized());
+    }
 
+    @Test
+    void performReading_unauthorized() throws Exception {
+        when(threeCardsDivinationService.getReadingForUser("user", "email")).thenThrow(UserNotFoundException.class);
+
+        mockMvc.perform(get("/three-cards-divination")
+                        .header("Authorization", AUTH_HEADER))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    void performReading_noAuthHeaders() throws Exception {
         mockMvc.perform(get("/three-cards-divination"))
-                .andExpect(status().isPreconditionFailed());
+                .andExpect(status().isForbidden());
     }
 }
