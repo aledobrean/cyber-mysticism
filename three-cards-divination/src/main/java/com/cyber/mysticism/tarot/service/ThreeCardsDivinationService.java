@@ -163,6 +163,6 @@ public class ThreeCardsDivinationService {
     }
 
     private String getHashCode(Map<String, Card> reading) {
-        return String.valueOf(Objects.hashCode(reading));
+        return String.valueOf(Objects.hash(reading));
     }
 }

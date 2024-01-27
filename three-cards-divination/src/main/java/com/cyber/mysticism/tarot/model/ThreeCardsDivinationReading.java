@@ -14,6 +14,7 @@ public class ThreeCardsDivinationReading {
     @JsonProperty("hash_code")
     private String hashCode;
 
+    // reading is stored as a string of 1500, because for json persistence the solution is more complex
     @Column(name = "reading", length = 1500)
     @JsonProperty("reading")
     private String reading;

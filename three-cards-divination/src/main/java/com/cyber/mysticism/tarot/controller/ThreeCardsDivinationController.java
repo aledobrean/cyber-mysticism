@@ -18,6 +18,7 @@ import java.util.Map;
 @RestController
 public class ThreeCardsDivinationController {
 
+    public static final String UNAUTHORIZED = "Unauthorized!";
     private final ThreeCardsDivinationService threeCardsDivinationService;
 
     @Autowired
@@ -34,8 +35,9 @@ public class ThreeCardsDivinationController {
         try {
             return threeCardsDivinationService.getReadingForUser(username, email);
         } catch (UserNotFoundException e) {
-            throw new UnauthorisedAccessException("Unauthorized!");
+            throw new UnauthorisedAccessException(UNAUTHORIZED);
         }
+
     }
 
     private String[] authenticateAndParseHeader(String authHeader) throws UnauthorisedAccessException, ForbiddenAccessException {
@@ -45,7 +47,7 @@ public class ThreeCardsDivinationController {
             String base64Credentials = authHeader.substring("Basic".length()).trim();
             return getCredentialsFromHeaders(base64Credentials);
         } else {
-            throw new UnauthorisedAccessException("Unauthorized!");
+            throw new UnauthorisedAccessException(UNAUTHORIZED);
         }
     }
 

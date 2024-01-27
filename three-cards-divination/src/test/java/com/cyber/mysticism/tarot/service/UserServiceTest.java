@@ -29,6 +29,8 @@ class UserServiceTest {
 
     @BeforeEach
     void setup() {
+        reset(userRepository);
+
         tarotUser = new TarotUser();
         tarotUser.setUsername("user");
         tarotUser.setEmail("email");
