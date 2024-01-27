@@ -3,6 +3,7 @@ package com.cyber.mysticism.tarot.service;
 import com.cyber.mysticism.tarot.json.Card;
 import com.cyber.mysticism.tarot.model.TarotUser;
 import com.cyber.mysticism.tarot.repository.TarotDeckRepository;
+import com.cyber.mysticism.tarot.repository.ThreeCardsDivinationRepository;
 import com.cyber.mysticism.tarot.repository.UserRepository;
 import com.cyber.mysticism.tarot.service.exceptions.DivinationException;
 import com.cyber.mysticism.tarot.service.exceptions.UserNotFoundException;
@@ -31,9 +32,17 @@ class ThreeCardsDivinationServiceTest {
     @Mock
     private UserRepository userRepository;
     @Mock
+    private ThreeCardsDivinationRepository threeCardsDivinationRepository;
+    @Mock
     private TarotUser tarotUser;
     @InjectMocks
     private ThreeCardsDivinationService service;
+
+    private static List<Card> getCards() {
+        return List.of(new Card("The Fool", 0, "Major Arcana", "0", List.of()),
+                new Card("The Magician", 1, "Major Arcana", "1", List.of()),
+                new Card("Seven of Cups", 7, "Minor Arcana", "7", List.of("You're being fed a line")));
+    }
 
     @BeforeEach
     void setup() {
@@ -43,10 +52,9 @@ class ThreeCardsDivinationServiceTest {
 
     @Test
     void getReadingForUser() throws Exception {
-        List<Card> cards = List.of(new Card("The Fool", 0, "Major Arcana", "0", List.of()),
-                new Card("The Magician", 1, "Major Arcana", "1", List.of()),
-                new Card("Seven of Cups", 7, "Minor Arcana", "7", List.of("You're being fed a line")));
-        when(tarotDeckRepository.getCards()).thenReturn(cards);
+        when(tarotDeckRepository.getCards()).thenReturn(getCards());
+        when(tarotUser.getUsername()).thenReturn("user");
+        when(threeCardsDivinationRepository.countReadingsByHashCodeForUsername(anyString(), eq("user"))).thenReturn(0L);
 
         Map<String, Card> reading = service.getReadingForUser("user", "email");
 
@@ -56,6 +64,20 @@ class ThreeCardsDivinationServiceTest {
                         .matches(map -> map.get("present") != null)
                         .matches(map -> map.get("future") != null),
                 () -> verify(tarotDeckRepository, times(2)).getCards(),
+                () -> verify(userRepository).save(any(TarotUser.class))
+        );
+    }
+
+    @Test
+    void getReadingForUser_duplicatedReading() throws Exception {
+        when(tarotDeckRepository.getCards()).thenReturn(getCards());
+        when(tarotUser.getUsername()).thenReturn("user");
+        when(threeCardsDivinationRepository.countReadingsByHashCodeForUsername(anyString(), eq("user"))).thenReturn(1L, 0L);
+
+        service.getReadingForUser("user", "email");
+
+        assertAll(
+                () -> verify(tarotDeckRepository, atLeast(4)).getCards(),
                 () -> verify(userRepository).save(any(TarotUser.class))
         );
     }

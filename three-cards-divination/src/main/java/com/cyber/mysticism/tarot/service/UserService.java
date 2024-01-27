@@ -37,24 +37,24 @@ public class UserService {
 
     public TarotUser save(TarotUser tarotUser) throws UserAlreadyExistsException {
         if (tarotUser.getUsername() != null && findByUsername(tarotUser.getUsername()).isPresent()) {
-            logger.info("event=save_user, status=error, reason=username_exists");
+            logger.info("event=save_user, status=error, reason=username_exists, username={}", tarotUser.getUsername());
             throw new UserAlreadyExistsException("Username already exists, choose a different one.");
         } else if (tarotUser.getEmail() != null && findByEmail(tarotUser.getEmail()).isPresent()) {
-            logger.info("event=save_user, status=error, reason=email_exists");
+            logger.info("event=save_user, status=error, reason=email_exists, email={}", tarotUser.getEmail());
             throw new UserAlreadyExistsException("Email already exists, choose a different one.");
         } else {
-            logger.info("event=save_user, status=success");
+            logger.info("event=save_user, status=success, username={}", tarotUser.getUsername());
             return userRepository.save(tarotUser);
         }
     }
 
     public void deleteByUsername(String username) throws UserNotFoundException {
         if (username != null && findByUsername(username).isPresent()) {
-            logger.info("event=delete_user, status=success");
+            logger.info("event=delete_user, status=success, username={}", username);
             userRepository.deleteById(username);
         } else {
             logger.info("event=delete_user, status=error, reason=user_not_found");
-            throw new UserNotFoundException("Couldn't delete user, user not found.");
+            throw new UserNotFoundException("Couldn't delete username='" + username + "', user not found.");
         }
     }
 }
