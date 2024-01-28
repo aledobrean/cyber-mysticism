@@ -1,15 +1,17 @@
 # Table of Contents
 
-- [**Introduction**](#introduction)
-- [**Getting Started**](#getting-started)
-    - [Docker](#Docker)
-- [Acknowledgements](#acknowledgements)
-    - [Contributors](#contributors)
+- [**Introduction**](#introduction) - A brief overview of the project.
+- [**Getting Started**](#getting-started) - Instructions on how to set up and run the project.
+    - [Docker](#Docker) - Instructions for Docker setup.
+    - [OpenAPI commands](#openapi-commands) - Instructions for OpenAPI contracts.
+- [Acknowledgements](#acknowledgements) - Recognizing those who have contributed to the project.
+    - [Contributors](#contributors) - List of project contributors.
 
 # **Introduction**
 
-All things mystic.
-Currently, the app contains a service for performing a three cards divination reading as JSON.
+Welcome to Cyber Mysticism, a project dedicated to all things mystic. This application provides a service for performing
+a three cards divination reading, returning the results in a JSON format. The readings are based on the Tarot, a tool of
+divination that offers insights into the past, present, and future.
 
 # **Getting Started**
 

@@ -13,6 +13,8 @@ paths:
       tags:
         - user-controller
       operationId: findAll
+      summary: Retrieve all users
+      description: This endpoint retrieves all users in the system.
       responses:
         "200":
           description: OK
@@ -26,6 +28,8 @@ paths:
       tags:
         - user-controller
       operationId: create
+      summary: Create an user
+      description: This endpoint creates an user in the system.
       requestBody:
         content:
           application/json:
@@ -44,6 +48,8 @@ paths:
       tags:
         - three-cards-divination-controller
       operationId: performReadingForUser
+      summary: Perform a reading for an user
+      description: This endpoint three cards divination reading for an authenticated user using basic auth.
       parameters:
         - name: Authorization
           in: header
@@ -64,6 +70,8 @@ paths:
       tags:
         - user-controller
       operationId: deleteById
+      summary: Delete an user
+      description: This endpoint delete an user from the system.
       parameters:
         - name: username
           in: path
