@@ -31,6 +31,7 @@
         <spring-boot-starter.version>3.2.0</spring-boot-starter.version>
         <postgresql.version>42.6.0</postgresql.version>
         <mockito-core.version>5.7.0</mockito-core.version>
+        <springdoc-openapi-starter-webmvc-ui>2.3.0</springdoc-openapi-starter-webmvc-ui>
     </properties>
     <dependencies>
         <dependency>
@@ -59,6 +60,11 @@
             <artifactId>postgresql</artifactId>
             <version>${postgresql.version}</version>
             <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+            <version>${springdoc-openapi-starter-webmvc-ui}</version>
         </dependency>
 
         <dependency>
