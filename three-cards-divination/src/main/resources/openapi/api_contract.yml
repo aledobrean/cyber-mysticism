@@ -1,0 +1,120 @@
+openapi: 3.0.1
+info:
+  title: OpenAPI definition
+  version: v0
+servers:
+  - url: http://localhost:8080
+    description: Generated server url
+  - url: http://localhost:5050
+    description: Docker server url
+paths:
+  /user:
+    get:
+      tags:
+        - user-controller
+      operationId: findAll
+      summary: Retrieve all users
+      description: This endpoint retrieves all users in the system.
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TarotUser'
+    post:
+      tags:
+        - user-controller
+      operationId: create
+      summary: Create an user
+      description: This endpoint creates an user in the system.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TarotUser'
+        required: true
+      responses:
+        "201":
+          description: Created
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/TarotUser'
+  /three-cards-divination:
+    get:
+      tags:
+        - three-cards-divination-controller
+      operationId: performReadingForUser
+      summary: Perform a reading for an user
+      description: This endpoint three cards divination reading for an authenticated user using basic auth.
+      parameters:
+        - name: Authorization
+          in: header
+          required: false
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: object
+                additionalProperties:
+                  $ref: '#/components/schemas/Card'
+  /user/{username}:
+    delete:
+      tags:
+        - user-controller
+      operationId: deleteById
+      summary: Delete an user
+      description: This endpoint delete an user from the system.
+      parameters:
+        - name: username
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: No Content
+components:
+  schemas:
+    TarotUser:
+      type: object
+      properties:
+        username:
+          type: string
+        email:
+          type: string
+        readings:
+          uniqueItems: true
+          type: array
+          items:
+            $ref: '#/components/schemas/ThreeCardsDivinationReading'
+    ThreeCardsDivinationReading:
+      type: object
+      properties:
+        hash_code:
+          type: string
+        reading:
+          type: string
+    Card:
+      type: object
+      properties:
+        name:
+          type: string
+        number:
+          type: integer
+          format: int32
+        arcana:
+          type: string
+        img:
+          type: string
+        fortune_telling:
+          type: array
+          items:
+            type: string
