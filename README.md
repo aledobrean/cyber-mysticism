@@ -21,7 +21,7 @@ The app is configured to start on port 5050.
 
 A pg-admin container also exists for development, but it needs to be uncommented from docker-compose.yml
 
-Replace <user> and <password> with proper values.
+Replace <user> and <password> with proper values, or don't provide any input and the default ones will be set.
 
 For linux/arm64/v8:
 
@@ -46,9 +46,9 @@ docker-compose up
 
 Prerequisite: change _springdoc.api-docs.enabled=true_ in application.properties
 
-- Access this URL for Swagger UI: http://localhost:8080/swagger-ui.html (change the host and the port if needed)
-- Access this URL for Swagger Docs API (json): http://localhost:8080/api-docs (change the host and the port if needed)
-- Access this URL for Swagger Docs API (yaml): http://localhost:8080/api-docs.yaml (change the host and the port if
+- Access this URL for Swagger UI: http://localhost:5050/swagger-ui.html (change the host and the port if needed)
+- Access this URL for Swagger Docs API (json): http://localhost:5050/api-docs (change the host and the port if needed)
+- Access this URL for Swagger Docs API (yaml): http://localhost:5050/api-docs.yaml (change the host and the port if
   needed)
 
 # Acknowledgements
