@@ -4,13 +4,14 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 
 import java.io.Serializable;
-import java.util.HashSet;
-import java.util.Set;
 
 @Entity
 @Table(name = "tarot_user")
 public class TarotUser implements Serializable {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
     @Column(name = "username", nullable = false, unique = true)
     @JsonProperty("username")
     private String username;
@@ -19,12 +20,13 @@ public class TarotUser implements Serializable {
     @JsonProperty("email")
     private String email;
 
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonProperty("readings")
-    private Set<ThreeCardsDivinationReading> readings = new HashSet<>();
-
     public TarotUser() {
         // for JPA
+    }
+
+    public TarotUser(String username, String email) {
+        this.username = username;
+        this.email = email;
     }
 
     public String getUsername() {
@@ -41,13 +43,5 @@ public class TarotUser implements Serializable {
 
     public void setEmail(String email) {
         this.email = email;
-    }
-
-    public Set<ThreeCardsDivinationReading> getReadings() {
-        return readings;
-    }
-
-    public void setReadings(Set<ThreeCardsDivinationReading> readings) {
-        this.readings = readings;
     }
 }

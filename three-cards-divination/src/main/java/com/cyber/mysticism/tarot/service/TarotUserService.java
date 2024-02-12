@@ -1,6 +1,7 @@
 package com.cyber.mysticism.tarot.service;
 
 import com.cyber.mysticism.tarot.model.TarotUser;
+import com.cyber.mysticism.tarot.repository.ReadingRepository;
 import com.cyber.mysticism.tarot.repository.UserRepository;
 import com.cyber.mysticism.tarot.service.exceptions.UserAlreadyExistsException;
 import com.cyber.mysticism.tarot.service.exceptions.UserNotFoundException;
@@ -13,12 +14,18 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-public class UserService {
+public class TarotUserService {
 
-    private static final Logger logger = LoggerFactory.getLogger(UserService.class);
+    private static final Logger logger = LoggerFactory.getLogger(TarotUserService.class);
+
+    private final UserRepository userRepository;
+    private final ReadingRepository readingRepository;
 
     @Autowired
-    private UserRepository userRepository;
+    public TarotUserService(UserRepository userRepository, ReadingRepository readingRepository) {
+        this.userRepository = userRepository;
+        this.readingRepository = readingRepository;
+    }
 
     public List<TarotUser> findAll() {
         logger.info("event=retrieve_all_users");
@@ -27,12 +34,23 @@ public class UserService {
 
     public Optional<TarotUser> findByUsername(String username) {
         logger.info("event=retrieve_user_by_username, username={}", username);
-        return userRepository.findById(username);
+        return userRepository.findByUsername(username);
     }
 
     public Optional<TarotUser> findByEmail(String email) {
         logger.info("event=retrieve_user_by_email, email={}", email);
         return userRepository.findByEmail(email);
+    }
+
+    public TarotUser findByUsernameAndEmail(String username, String email) throws UserNotFoundException {
+        logger.info("event=retrieve_user_by_username_and_email, username={}, email={}", username, email);
+        Optional<TarotUser> retrievedUser = userRepository.findByUsernameAndEmail(username, email);
+
+        if (retrievedUser.isEmpty()) {
+            logger.info("event=reading_for_user_failed, status=error, reason=invalid_user, user={}", username);
+            throw new UserNotFoundException("Cannot perform reading, user not found");
+        }
+        return retrievedUser.get();
     }
 
     public TarotUser save(TarotUser tarotUser) throws UserAlreadyExistsException {
@@ -49,9 +67,12 @@ public class UserService {
     }
 
     public void deleteByUsername(String username) throws UserNotFoundException {
-        if (username != null && findByUsername(username).isPresent()) {
+        Optional<TarotUser> user = findByUsername(username);
+        if (username != null && user.isPresent()) {
+            readingRepository.deleteByUser(user.get());
+            logger.info("event=delete_user_readings, status=success, username={}", username);
+            userRepository.deleteByUsername(username);
             logger.info("event=delete_user, status=success, username={}", username);
-            userRepository.deleteById(username);
         } else {
             logger.info("event=delete_user, status=error, reason=user_not_found");
             throw new UserNotFoundException("Couldn't delete username='" + username + "', user not found.");
