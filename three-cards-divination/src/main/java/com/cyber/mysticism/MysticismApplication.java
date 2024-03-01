@@ -9,5 +9,4 @@ public class MysticismApplication {
     public static void main(String[] args) {
         SpringApplication.run(MysticismApplication.class, args);
     }
-
 }
